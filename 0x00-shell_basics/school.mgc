@@ -1,2 +1,2 @@
-0 search/16 SCHOOL File containing "school"
-!:mime text/School
+#!/bin/bash
+file -C -m school

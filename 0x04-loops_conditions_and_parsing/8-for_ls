@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-#using ls as a variable stuff
-
-list=$(ls)
-for i in $list
+# This script is displaying "Holberton School" 10 times
+for i in *
 do
-    echo "$i" | cut -d'-' -f 2
+    echo "$i" | cut -d'-' -f2
 done

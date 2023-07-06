@@ -1,18 +1,25 @@
 #!/usr/bin/env bash
-# input:arg1 = domain arg2 = subdomain
-# output: The subdomain [SUB_DOMAIN] is a [RECORD_TYPE] record and points to [DESTINATION]
+# shellcheck disable=SC2086
+# Bash script that will display information about subdomains.
 
-if [ $# -eq 2 ]
-then
-	RECORD_TYPE=$(dig www.holberton.online | grep -A1 'ANSWER SECTION:' | awk '{print $4}' | sed '/./,$!d')
-	DESTINATION=$(dig www.holberton.online | grep -A1 'ANSWER SECTION:' | awk '{print $5}' | sed '/./,$!d')
-	echo "The subdomain $2 is a $RECORD_TYPE record and points to $DESTINATION"
-else
-	var=$1
-	declare -a subs=("www" "lb-01" "web-01" "web-02")
-	for sub in ${subs[@]}; do
-		RECORD_TYPE=$(dig ${sub}.${var} | grep -A1 'ANSWER SECTION:' | awk '{print $4}' | sed '/./,$!d')
-		DESTINATION=$(dig ${sub}.${var} | grep -A1 'ANSWER SECTION:' | awk '{print $5}' | sed '/./,$!d')
-		echo "The subdomain $sub is a $RECORD_TYPE record and points to $DESTINATION"
-	done
-fi
+excute () {
+        RECORD_TYPE=$(dig "$2"."$1" | awk 'BEGIN{OFS=" ";} /^'$2'/{print $4}')
+        DESTINATION=$(dig "$2"."$1" | awk 'BEGIN{OFS=" ";} /^'$2'/{print $5}')
+        echo "The subdomain $2 is a $RECORD_TYPE record and points to $DESTINATION"
+}
+domain=$1
+subdomain=$2
+sub=( www lb-01 web-01 web-02 )
+check () {
+    if [[ $subdomain == "" ]]
+    then
+        for x in "${sub[@]}"
+        do
+            excute "$domain" "$x"
+        done
+    else
+        excute "$domain" "$subdomain"
+    fi
+    return 0
+}
+check

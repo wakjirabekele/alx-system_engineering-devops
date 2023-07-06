@@ -1,19 +1,18 @@
 #!/usr/bin/env bash
-# Usage: ./1-world_wide_web <domain> <subdomain>
-# Display information about subdomains.
+# input:arg1 = domain arg2 = subdomain
+# output: The subdomain [SUB_DOMAIN] is a [RECORD_TYPE] record and points to [DESTINATION]
 
-domain_information () {
-    line=$(dig "$2"."$1" | grep -A1 'ANSWER SECTION:' | tr '\t' '\n' | tail -2 | tr '\n' ' ')
-    echo "$2 $line" | awk '{print "The subdomain " $1 " is a " $2 " record and points to " $3}'
-}
-
-if [ "$#" == 1 ]
+if [ $# -eq 2 ]
 then
-  domain_information "$1" "www"
-  domain_information "$1" "lb-01"
-  domain_information "$1" "web-01"
-  domain_information "$1" "web-02"
-elif [ "$#" == 2 ]
-then
-  domain_information "$1" "$2"
+	RECORD_TYPE=$(dig www.holberton.online | grep -A1 'ANSWER SECTION:' | awk '{print $4}' | sed '/./,$!d')
+	DESTINATION=$(dig www.holberton.online | grep -A1 'ANSWER SECTION:' | awk '{print $5}' | sed '/./,$!d')
+	echo "The subdomain $2 is a $RECORD_TYPE record and points to $DESTINATION"
+else
+	var=$1
+	declare -a subs=("www" "lb-01" "web-01" "web-02")
+	for sub in ${subs[@]}; do
+		RECORD_TYPE=$(dig ${sub}.${var} | grep -A1 'ANSWER SECTION:' | awk '{print $4}' | sed '/./,$!d')
+		DESTINATION=$(dig ${sub}.${var} | grep -A1 'ANSWER SECTION:' | awk '{print $5}' | sed '/./,$!d')
+		echo "The subdomain $sub is a $RECORD_TYPE record and points to $DESTINATION"
+	done
 fi
